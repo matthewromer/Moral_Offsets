@@ -31,7 +31,7 @@ americanDietKg = {'pigs': 37.3+30.2+0.8,\
 
 #Lifetimes in years
 #Means from https://reducing-suffering.org/how-much-direct-suffering-is-caused-by-various-animal-foods/#Results_table
-#Stds mad eup 
+#Stds made up 
 lifetimes = {'pigs': [183/365, 20/365],\
              'chickens': [42/365, 10/365],\
              'salmon': [639/365, 100/365],\
