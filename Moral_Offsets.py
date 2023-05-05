@@ -5,9 +5,6 @@ Script to analyze cost of morally offsetting the average American diet
 ############################# SETUP #############################
 import squigglepy as sq
 import numpy as np
-import matplotlib.pyplot as plt
-from squigglepy.numbers import K, M
-from pprint import pprint
 import pickle
 import os
 
@@ -99,7 +96,7 @@ for species in dietSpeciesList:
 samples = sumDist @ 10000
 sumArray = np.array(samples)
 sumStats = np.percentile(sumArray, [5, 50, 95]) 
-print("5th, 50th, 95th percentiles for Human-Equivalent Welfare Impacts of Diet: {}".format(sumStats))
+print("5th, 50th, 95th percentiles for Human-Year Equivalent Welfare Impacts of Diet: {}".format(sumStats))
 #Need to compute impact of THL/SWP donation
 
 #Need to add in climate effects 
