@@ -1,14 +1,14 @@
-class foodType:
-    #foodType is a class defining a type of food in the american diet 
+class FoodType:
+    # FoodType is a class defining a type of food in the american diet 
     #
     # Properties 
     #   - species               - Name of animal species that produces this food
     #   - sufferingYearsPerKg   - Distribution of years of suffering per kg of this food
-    #   - sufferingLevel        - Distribution of level of suffering during production (-0.5 to 0.5)
+    #   - sufferingLevel        - Distribution of fractional level of suffering during production (-0.5 to 0.5)
     #   - annaulConsumptionKg   - Distribution of average American annual consumption of this food (kg)
-    #   - welfareRange          - Welfare range of this species (relative to humans)
+    #   - welfareRange          - Distribution of welfare range of this species (relative to humans)
     #   - co2ekgPerkg           - kg of CO2e per kg of this food
-    #   - welfareImpact         - Distribution of total welfare impact of this food (human-equivalent WELLBYs)
+    #   - welfareImpact         - Distribution of total welfare impact of this food (human-equivalent DALYS)
     #   - welfareImpact         - Distribution of total climate impact of this food (kg CO2e)
     #
     # Methods 
@@ -40,7 +40,7 @@ class foodType:
         self.welfareRange         = welfareRange 
         self.co2ekgPerkg          = co2ekgPerkg
         
-        #Welfare impact in human-equivalent WELLBYs is the product of annual
+        #Welfare impact in human-equivalent DALYs is the product of annual
         #consumption in kg, years of suffering per kg, suffering level, and
         #welfare range
         self.welfareImpact = self.annualConsumptionKg*self.sufferingYearsPerKg*\
