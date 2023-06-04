@@ -1,3 +1,5 @@
+#ComputeSummaryStats returns summary statistics for a squiggle distribution
+
 import numpy as np
 
 def computeSummaryStats(dist,printEn=False,name=""):

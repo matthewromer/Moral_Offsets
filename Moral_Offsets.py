@@ -8,13 +8,14 @@ import os
 import pandas as pd 
 from FoodType import FoodType
 from computeSummaryStats import computeSummaryStats
+from sqDistWrapper import sqDistWrapper
 
 ############################# INPUTS #############################
     
 #Read in diet input data
 # Note: treating all fish as farmed right now. Need to figure out balance 
 # between farmed/wild-caught and how to model. Current format doesn't allow 
-# for uncertainty in concumption 
+# for uncertainty in consumption 
 inputData = pd.read_csv('inputs.csv', index_col=0,header=0)
 foodTypes = list(inputData.index);
 
@@ -28,6 +29,8 @@ welfareCapacity = dict.fromkeys(rpSpeciesList)
 for species in rpSpeciesList:
      welfareCapacity[species] = pickle.load(open('{}_wr_Mixture Neuron Count_model.p'.format(os.path.join('welfare_range_estimates', species)), 'rb'))
 
+#Verbose flag
+verbose = False
 
 ################### COMPUTING HARMS OF MEAT EATING ###################
 
@@ -43,18 +46,24 @@ for food in foodTypes:
                      sq.norm(mean=inputData.loc[food]['Welfare Level Mean'], sd=inputData.loc[food]['Welfare Level SD'],lclip=minWelfare,rclip=maxWelfare),\
                      inputData.loc[food]['Average Annual US Consumption (kg)'],\
                      sq.discrete(welfareCapacity[inputData.loc[food]['Source Animal (Approx.)']]),\
-                     sq.norm(mean=inputData.loc[food]['CO2e Mean per kg (kg)'], sd=inputData.loc[food]['CO2e SD per kg (kg)']))
+                     sqDistWrapper(inputData.loc[food]['CO2e Distribution Type'],inputData.loc[food]['CO2e 5th Percentile Per kg (kg)'],inputData.loc[food]['CO2e 95th Percentile Per kg (kg)']),\
+                     sqDistWrapper(inputData.loc[food]['Fresh Water Distribution Type'],inputData.loc[food]['Fresh Water 5th Percentile Per kg (L)'],inputData.loc[food]['Fresh Water 95th Percentile Per kg (L)']),\
+                     sqDistWrapper(inputData.loc[food]['Land Use Distribution Type'],inputData.loc[food]['Land Use 5th Percentile per kg (m^2)'],inputData.loc[food]['Land Use 95th Percentile per kg (m^2)']))
 
 #Would like a second step here that involves augmenting distributions with additional 
 #animals killed to feed the farmed animals 
 
-#Sum welfare and climate impact distributions across all food types
-welfareSumDist = sq.norm(mean=0, sd=0)
-climateSumDist = sq.norm(mean=0, sd=0)
+#Sum impact distributions across all food types
+welfareSumDist  = sq.norm(mean=0, sd=0)
+climateSumDist  = sq.norm(mean=0, sd=0)
+landUseSumDist  = sq.norm(mean=0, sd=0)
+WaterUseSumDist = sq.norm(mean=0, sd=0)
 welfareImpactStats = dict.fromkeys(foodTypes)
 for food in foodTypes:
-    welfareSumDist = welfareSumDist + foodDict[food].welfareImpact
-    climateSumDist = climateSumDist + foodDict[food].climateImpact
+    welfareSumDist  = welfareSumDist + foodDict[food].welfareImpact
+    climateSumDist  = climateSumDist + foodDict[food].climateImpact
+    landUseSumDist  = landUseSumDist + foodDict[food].landUseImpact
+    WaterUseSumDist = WaterUseSumDist + foodDict[food].waterUseImpact
 
 #Modify climate effects distribution to account for climate impacts of 
 #substitution
@@ -96,4 +105,16 @@ dalyEquivsPerDollar = chickYearsPerDollar*welfareLevelImprovement*sq.discrete(we
 costOfWelfareOffsetting = -1*welfareSumDist/dalyEquivsPerDollar
 computeSummaryStats(costOfWelfareOffsetting,printEn=True,name='Total Cost of Welfare Offsets:')
 
-
+if verbose:
+    print('CO2e \n')
+    for food in foodTypes:
+        print(food)
+        computeSummaryStats(foodDict[food].co2eKgPerKg,True)
+    print('Water \n')
+    for food in foodTypes:
+        print(food)
+        computeSummaryStats(foodDict[food].waterLPerKg,True)        
+    print('Land Use \n')
+    for food in foodTypes:
+        print(food)
+        computeSummaryStats(foodDict[food].landM2PerKg,True)
